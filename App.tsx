@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import { NavigationContainer } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext'
 import { AppNavigator } from './src/navigation/AppNavigator'
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native'
 import * as Font from 'expo-font'
 import { Kanit_400Regular, Kanit_600SemiBold, Kanit_700Bold, Kanit_800ExtraBold } from '@expo-google-fonts/kanit'
+import { requestPermission, startPolling, setOnMessage } from './src/services/notifications'
+import { startAutoSync } from './src/services/sync'
 import './src/i18n'
 
 if (typeof document !== 'undefined') {
@@ -17,6 +19,14 @@ if (typeof document !== 'undefined') {
 
 function AppContent() {
   const { colors, isDark, fontLoaded } = useTheme()
+
+  useEffect(() => {
+    requestPermission().then((granted) => {
+      if (granted) startPolling()
+    })
+    startAutoSync()
+  }, [])
+
   if (!fontLoaded) {
     return (
       <View style={[styles.loading, { backgroundColor: colors.background }]}>

@@ -8,8 +8,9 @@ import { Secretary } from '../components/Secretary'
 import { HabitCard } from '../components/HabitCard'
 import { Modal } from '../components/Modal'
 import { EmptyState } from '../components/EmptyState'
-import { getHabits, addHabit, updateHabit, deleteHabit, getLogsForDate, logHabit, getTasksForDate, getFocusSessions, addXp, getXp } from '../db'
+import { getHabits, addHabit, updateHabit, deleteHabit, getLogsForDate, logHabit, getTasksForDate, addXp, getXp } from '../db'
 import { XP_SOURCES } from '../ranks'
+import { setOnMessage } from '../services/notifications'
 
 export function TodayScreen() {
   const { t } = useTranslation()
@@ -23,6 +24,7 @@ export function TodayScreen() {
   const [xp, setXp] = useState(0)
   const [greeting, setGreeting] = useState('')
   const [modalVisible, setModalVisible] = useState(false)
+  const [agentMessage, setAgentMessage] = useState<string | null>(null)
   const [editId, setEditId] = useState<string | null>(null)
   const [name, setName] = useState('')
   const [emoji, setEmoji] = useState('⭐')
@@ -42,6 +44,10 @@ export function TodayScreen() {
   }, [today, t])
 
   useEffect(() => { loadData() }, [loadData])
+
+  useEffect(() => {
+    setOnMessage((msg) => setAgentMessage(msg.text))
+  }, [])
 
   const toggleHabit = async (habitId: string, currentCompleted: boolean) => {
     await logHabit(habitId, today, !currentCompleted)
@@ -121,6 +127,17 @@ export function TodayScreen() {
               </Text>
             </View>
 
+            {agentMessage && (
+              <TouchableOpacity
+                onPress={() => setAgentMessage(null)}
+                style={[styles.agentBanner, { backgroundColor: colors.primary + '15', borderColor: colors.primary }]}
+              >
+                <Text style={styles.agentEmoji}>🤖</Text>
+                <Text style={[styles.agentText, { color: colors.text }]}>{agentMessage}</Text>
+                <Text style={[styles.agentDismiss, { color: colors.textSecondary }]}>✕</Text>
+              </TouchableOpacity>
+            )}
+
             <View style={[styles.progressCard, { backgroundColor: colors.card }]}>
               <Text style={[styles.progressText, { color: colors.text }]}>
                 {doneCount}/{totalCount} {t('today.done')}
@@ -186,6 +203,15 @@ const styles = StyleSheet.create({
   addFabText: { color: '#fff', fontSize: 24, fontWeight: '600', marginTop: -2 },
   rankCard: { alignItems: 'center', paddingVertical: spacing.md, paddingHorizontal: spacing.lg, marginHorizontal: spacing.lg, borderRadius: borderRadius.lg, marginBottom: spacing.md },
   rankHint: { fontSize: fontSize.xs, marginTop: spacing.sm },
+  agentBanner: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: spacing.lg, padding: spacing.md,
+    borderRadius: borderRadius.md, borderWidth: 1,
+    marginBottom: spacing.md, gap: spacing.sm,
+  },
+  agentEmoji: { fontSize: 20 },
+  agentText: { flex: 1, fontSize: fontSize.sm, lineHeight: 18 },
+  agentDismiss: { fontSize: 16, padding: spacing.xs },
   progressCard: { marginHorizontal: spacing.lg, padding: spacing.md, borderRadius: borderRadius.md, marginBottom: spacing.md },
   progressText: { fontSize: fontSize.sm, fontWeight: '600', marginBottom: spacing.sm },
   progressBar: { height: 8, borderRadius: 4, overflow: 'hidden' },

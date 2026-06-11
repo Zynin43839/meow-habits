@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "meow-habits": {
+      "command": "node",
+      "args": ["server/mcp.js"],
+      "env": {},
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

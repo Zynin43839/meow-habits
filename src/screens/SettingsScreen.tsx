@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { View, Text, TouchableOpacity, Switch, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
@@ -7,12 +7,21 @@ import { spacing, fontSize, borderRadius } from '../theme/spacing'
 import { changeLanguage } from '../i18n'
 import { getXp } from '../db'
 import { getRankProgress } from '../ranks'
+import { requestPermission, startPolling, stopPolling } from '../services/notifications'
 
 export function SettingsScreen() {
   const { t, i18n } = useTranslation()
   const { colors, isDark, toggleTheme, accentColor, setAccentColor } = useTheme()
   const insets = useSafeAreaInsets()
   const [notifications, setNotifications] = useState(false)
+  const toggleNotifications = useCallback(async (value: boolean) => {
+    if (value) {
+      const granted = await requestPermission()
+      if (granted) { startPolling(); setNotifications(true) }
+    } else {
+      stopPolling(); setNotifications(false)
+    }
+  }, [])
   const lang = i18n.language as 'th' | 'en'
 
   const [xp, setXp] = useState(0)
@@ -87,7 +96,7 @@ export function SettingsScreen() {
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('settings.notifications')}</Text>
         <View style={[styles.row, { backgroundColor: colors.card }]}>
           <Text style={[styles.rowLabel, { color: colors.text }]}>{t('settings.notificationTime')}: 07:00</Text>
-          <Switch value={notifications} onValueChange={setNotifications} trackColor={{ false: colors.border, true: colors.primary }} />
+          <Switch value={notifications} onValueChange={toggleNotifications} trackColor={{ false: colors.border, true: colors.primary }} />
         </View>
       </View>
 
