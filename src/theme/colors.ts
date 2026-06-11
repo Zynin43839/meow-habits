@@ -1,46 +1,37 @@
 export const palette = {
-  // Core
-  primary: '#FF8BA7',
-  primaryDark: '#E86A8A',
-  secondary: '#C9A0DC',
-  secondaryDark: '#A87DC4',
+  primary: '#FF6B9D',
+  primaryDark: '#E8537F',
+  secondary: '#B388EB',
+  accent: '#FFB74D',
+  accentLight: '#FFE0B2',
 
-  // Accent (default)
-  accent: '#FFB347',
-  accentLight: '#FFD699',
-
-  // Backgrounds
-  bgLight: '#FFF5F7',
-  bgDark: '#1A1A2E',
+  bgLight: '#FFF0F5',
+  bgDark: '#1F1A2E',
   cardLight: '#FFFFFF',
-  cardDark: '#2D2D44',
+  cardDark: '#2D2640',
+  cardWarm: '#FFF8F0',
 
-  // Text
-  textPrimaryLight: '#2D2D44',
-  textPrimaryDark: '#F0F0F5',
-  textSecondaryLight: '#7A7A8C',
-  textSecondaryDark: '#B0B0C0',
+  textPrimaryLight: '#2D1B4E',
+  textPrimaryDark: '#F0EBF5',
+  textSecondaryLight: '#7A6B8A',
+  textSecondaryDark: '#B0A3C0',
 
-  // Status
-  success: '#6BCB77',
-  warning: '#FFB347',
-  danger: '#FF6B6B',
-  info: '#74B9FF',
+  success: '#66BB6A',
+  warning: '#FFB74D',
+  danger: '#EF5350',
+  info: '#64B5F6',
 
-  // Streak
-  streakHigh: '#FF8BA7',
-  streakMedium: '#FFB347',
-  streakLow: '#B0B0C0',
+  streakHigh: '#FF6B9D',
+  streakMedium: '#FFB74D',
+  streakLow: '#B0A3C0',
 
-  // Calendar
-  calendarDone: '#6BCB77',
-  calendarMiss: '#FF6B6B',
-  calendarFuture: '#E8E8F0',
-  calendarToday: '#FF8BA7',
+  calendarDone: '#66BB6A',
+  calendarMiss: '#EF5350',
+  calendarFuture: '#E8DDF5',
+  calendarToday: '#FF6B9D',
 
-  // Misc
-  border: '#E8E8F0',
-  borderDark: '#3D3D54',
+  border: '#F0E6F0',
+  borderDark: '#3D3354',
   overlay: 'rgba(0,0,0,0.5)',
   white: '#FFFFFF',
   black: '#000000',
@@ -71,6 +62,7 @@ export const lightTheme = {
     overlay: palette.overlay,
     white: palette.white,
     black: palette.black,
+    cardWarm: palette.cardWarm,
   },
 }
 
@@ -94,11 +86,12 @@ export const darkTheme = {
     streakLow: palette.streakLow,
     calendarDone: palette.calendarDone,
     calendarMiss: palette.calendarMiss,
-    calendarFuture: '#3D3D54',
+    calendarFuture: '#3D3354',
     calendarToday: palette.primary,
     overlay: palette.overlay,
     white: palette.cardDark,
     black: palette.bgDark,
+    cardWarm: palette.cardDark,
   },
 }
 

@@ -10,11 +10,12 @@ interface ThemeContextType {
   toggleTheme: () => void
   accentColor: string
   setAccentColor: (color: string) => void
+  fontLoaded: boolean
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children, fontLoaded = true }: { children: React.ReactNode; fontLoaded?: boolean }) {
   const systemScheme = useColorScheme()
   const [isDark, setIsDark] = useState(systemScheme === 'dark')
   const [accentColor, setAccentColor] = useState('#FF8BA7')
@@ -45,7 +46,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const colors = theme.colors
 
   return (
-    <ThemeContext.Provider value={{ theme, colors, isDark, toggleTheme, accentColor, setAccentColor: handleSetAccentColor }}>
+    <ThemeContext.Provider value={{ theme, colors, isDark, toggleTheme, accentColor, setAccentColor: handleSetAccentColor, fontLoaded }}>
       {children}
     </ThemeContext.Provider>
   )

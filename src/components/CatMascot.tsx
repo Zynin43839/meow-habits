@@ -1,36 +1,68 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import React, { useEffect, useRef } from 'react'
+import { View, Text, Animated, StyleSheet } from 'react-native'
 import { useTheme } from '../theme/ThemeContext'
 import { spacing, fontSize, borderRadius } from '../theme/spacing'
 
-const catLevels = [
-  { level: 1, emoji: '🐱', name: 'ลูกแมว' },
-  { level: 5, emoji: '🐈', name: 'แมวน้อย' },
-  { level: 10, emoji: '🐈‍⬛', name: 'แมวโต' },
-  { level: 20, emoji: '🦁', name: 'สิงโต' },
-  { level: 50, emoji: '🐯', name: 'เสือ' },
+const catForms = [
+  { level: 1, emoji: '🥚', name: 'Egg' },
+  { level: 3, emoji: '🐣', name: 'Hatchling' },
+  { level: 5, emoji: '🐱', name: 'Kitten' },
+  { level: 10, emoji: '😸', name: 'Cat' },
+  { level: 20, emoji: '😺', name: 'Happy Cat' },
+  { level: 35, emoji: '🦁', name: 'Lion' },
+  { level: 50, emoji: '🐯', name: 'Tiger' },
+  { level: 75, emoji: '🦄', name: 'Legendary' },
+  { level: 100, emoji: '🌟', name: 'Star' },
 ]
 
-export function CatMascot({ level, xp, xpToNext, size = 60 }: { level: number; xp: number; xpToNext: number; size?: number }) {
+export function CatMascot({ level, xp, xpToNext, size = 80 }: { level: number; xp: number; xpToNext: number; size?: number }) {
   const { colors } = useTheme()
-  const cat = [...catLevels].reverse().find((c) => level >= c.level) || catLevels[0]
+  const bounceAnim = useRef(new Animated.Value(0)).current
+
+  const form = [...catForms].reverse().find((c) => level >= c.level) || catForms[0]
   const progress = Math.min(xp / xpToNext, 1)
 
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(bounceAnim, { toValue: -8, duration: 800, useNativeDriver: true }),
+        Animated.timing(bounceAnim, { toValue: 0, duration: 800, useNativeDriver: true }),
+      ])
+    ).start()
+  }, [])
+
   return (
-    <View style={styles.container}>
-      <Text style={[styles.emoji, { fontSize: size }]}>{cat.emoji}</Text>
-      <View style={[styles.xpBar, { backgroundColor: colors.border, borderRadius: borderRadius.sm }]}>
-        <View style={[styles.xpFill, { width: `${progress * 100}%`, backgroundColor: colors.accent, borderRadius: borderRadius.sm }]} />
+    <Animated.View style={[styles.container, { transform: [{ translateY: bounceAnim }] }]}>
+      <View style={[styles.avatarCircle, { backgroundColor: colors.cardWarm, borderColor: colors.primary, borderWidth: 3 }]}>
+        <Text style={[styles.emoji, { fontSize: size * 0.6 }]}>{form.emoji}</Text>
       </View>
-      <Text style={[styles.label, { color: colors.textSecondary }]}>Lv.{level}</Text>
-    </View>
+      <View style={styles.info}>
+        <Text style={[styles.levelText, { color: colors.textSecondary }]}>Lv.{level} {form.name}</Text>
+        <View style={[styles.xpBar, { backgroundColor: colors.border }]}>
+          <View style={[styles.xpFill, { width: `${progress * 100}%`, backgroundColor: colors.accent }]} />
+        </View>
+      </View>
+    </Animated.View>
   )
 }
 
 const styles = StyleSheet.create({
   container: { alignItems: 'center' },
+  avatarCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
+  },
   emoji: { lineHeight: undefined },
-  xpBar: { width: 120, height: 8, marginTop: spacing.xs, overflow: 'hidden' },
-  xpFill: { height: '100%' },
-  label: { fontSize: fontSize.xs, marginTop: 2 },
+  info: { alignItems: 'center', marginTop: spacing.sm },
+  levelText: { fontSize: fontSize.xs, fontWeight: '700', marginBottom: 4 },
+  xpBar: { width: 100, height: 10, borderRadius: 5, overflow: 'hidden' },
+  xpFill: { height: '100%', borderRadius: 5 },
 })
