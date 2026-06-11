@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme/ThemeContext'
 import { spacing, fontSize, borderRadius } from '../theme/spacing'
-import { getHabits, getLogsForDateRange } from '../db'
+import { getHabits, getLogsForDateRange, getFocusSessions, getJournalEntries } from '../db'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -15,6 +15,8 @@ export function CalendarScreen() {
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [habits, setHabits] = useState<any[]>([])
   const [logs, setLogs] = useState<any[]>([])
+  const [sessions, setSessions] = useState<any[]>([])
+  const [journals, setJournals] = useState<any[]>([])
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
 
   const year = currentMonth.getFullYear()
@@ -29,6 +31,8 @@ export function CalendarScreen() {
   const loadData = useCallback(async () => {
     setHabits(await getHabits())
     setLogs(await getLogsForDateRange(startDate, endDate))
+    setSessions(await getFocusSessions(startDate, endDate))
+    setJournals(await getJournalEntries(startDate, endDate))
   }, [startDate, endDate])
 
   useEffect(() => { loadData() }, [loadData])
@@ -54,6 +58,8 @@ export function CalendarScreen() {
   const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
   const selectedDayLogs = selectedDate ? logs.filter((l: any) => l.date === selectedDate) : []
+  const selectedDaySessions = selectedDate ? sessions.filter((s: any) => s.date === selectedDate) : []
+  const selectedDayJournal = selectedDate ? journals.find((j: any) => j.date === selectedDate) : null
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
@@ -121,18 +127,50 @@ export function CalendarScreen() {
           <Text style={[styles.detailTitle, { color: colors.text }]}>
             {new Date(selectedDate + 'T00:00:00').toLocaleDateString('th-TH', { weekday: 'long', day: 'numeric', month: 'long' })}
           </Text>
-          {selectedDayLogs.length === 0 ? (
-            <Text style={[styles.noLogs, { color: colors.textSecondary }]}>No data for this day</Text>
-          ) : (
-            selectedDayLogs.map((log: any) => (
-              <View key={log.id} style={styles.logRow}>
-                <Text style={styles.logEmoji}>{log.emoji}</Text>
-                <Text style={[styles.logName, { color: colors.text }]}>{log.name}</Text>
-                <Text style={{ color: log.completed ? colors.success : colors.danger }}>
-                  {log.completed ? '✓' : '✗'}
+
+          {selectedDayLogs.length > 0 && (
+            <>
+              <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>📋 {t('calendar.habits')}</Text>
+              {selectedDayLogs.map((log: any) => (
+                <View key={log.id} style={styles.logRow}>
+                  <Text style={styles.logEmoji}>{log.emoji}</Text>
+                  <Text style={[styles.logName, { color: colors.text }]}>{log.name}</Text>
+                  <Text style={{ color: log.completed ? colors.success : colors.danger }}>
+                    {log.completed ? '✓' : '✗'}
+                  </Text>
+                </View>
+              ))}
+            </>
+          )}
+
+          {selectedDaySessions.length > 0 && (
+            <>
+              <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>⏱️ {t('calendar.focus')}</Text>
+              {selectedDaySessions.map((s: any) => (
+                <View key={s.id} style={styles.logRow}>
+                  <Text style={[styles.logName, { color: colors.text }]}>Focus session</Text>
+                  <Text style={{ color: colors.textSecondary }}>{s.totalFocusMinutes || s.workMinutes}m</Text>
+                </View>
+              ))}
+            </>
+          )}
+
+          {selectedDayJournal && (
+            <>
+              <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>📓 {t('calendar.journal')}</Text>
+              <Text style={[styles.journalMood, { color: colors.text }]}>
+                Mood: {['', '😢', '😕', '😐', '😊', '🤩'][selectedDayJournal.mood || 3]}
+              </Text>
+              {selectedDayJournal.note && (
+                <Text style={[styles.journalNote, { color: colors.textSecondary }]} numberOfLines={3}>
+                  {selectedDayJournal.note}
                 </Text>
-              </View>
-            ))
+              )}
+            </>
+          )}
+
+          {selectedDayLogs.length === 0 && selectedDaySessions.length === 0 && !selectedDayJournal && (
+            <Text style={[styles.noLogs, { color: colors.textSecondary }]}>{t('calendar.noData')}</Text>
           )}
         </View>
       )}
@@ -171,6 +209,9 @@ const styles = StyleSheet.create({
   logRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.xs },
   logEmoji: { fontSize: 18, marginRight: spacing.sm },
   logName: { flex: 1, fontSize: fontSize.sm },
+  sectionLabel: { fontSize: fontSize.xs, fontWeight: '700', marginTop: spacing.sm, marginBottom: spacing.xs },
+  journalMood: { fontSize: fontSize.sm, fontWeight: '600' },
+  journalNote: { fontSize: fontSize.xs, lineHeight: 18, marginTop: spacing.xs },
   legend: { flexDirection: 'row', justifyContent: 'center', gap: spacing.lg, padding: spacing.sm },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   legendDot: { width: 10, height: 10, borderRadius: 5 },

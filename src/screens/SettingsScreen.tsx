@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, Switch, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../theme/ThemeContext'
 import { spacing, fontSize, borderRadius } from '../theme/spacing'
 import { changeLanguage } from '../i18n'
+import { getXp } from '../db'
+import { getRankProgress } from '../ranks'
 
 export function SettingsScreen() {
   const { t, i18n } = useTranslation()
@@ -12,6 +14,11 @@ export function SettingsScreen() {
   const insets = useSafeAreaInsets()
   const [notifications, setNotifications] = useState(false)
   const lang = i18n.language as 'th' | 'en'
+
+  const [xp, setXp] = useState(0)
+  useEffect(() => { getXp().then(setXp) }, [])
+
+  const { currentRank, nextRank, progress } = getRankProgress(xp)
 
   const colors_palette = ['#FF8BA7', '#FFB347', '#6BCB77', '#74B9FF', '#C9A0DC', '#FF6B6B', '#A8E6CF', '#FFB5A7']
 
@@ -44,6 +51,22 @@ export function SettingsScreen() {
           >
             <Text style={{ color: lang === 'en' ? '#fff' : colors.text, fontWeight: '600' }}>{t('settings.english')}</Text>
           </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('settings.rank')}</Text>
+        <View style={[styles.row, { backgroundColor: colors.card }]}>
+          <View>
+            <Text style={[styles.rowLabel, { color: colors.text }]}>
+              {currentRank.emoji} {currentRank.title} — {xp} {t('settings.xp')}
+            </Text>
+            {nextRank && (
+              <Text style={{ fontSize: fontSize.xs, color: colors.textSecondary, marginTop: 2 }}>
+                Next: {nextRank.emoji} {nextRank.title} ({Math.round((1 - progress) * (nextRank.xpRequired - currentRank.xpRequired))} XP to go)
+              </Text>
+            )}
+          </View>
         </View>
       </View>
 

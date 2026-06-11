@@ -5,9 +5,9 @@ import { spacing, fontSize, borderRadius } from '../theme/spacing'
 
 const tabs = [
   { key: 'Today', emoji: '🏠', label: 'Today' },
-  { key: 'Habits', emoji: '📋', label: 'Habits' },
+  { key: 'Focus', emoji: '⏱️', label: 'Focus' },
   { key: 'Calendar', emoji: '📅', label: 'Calendar' },
-  { key: 'Stats', emoji: '📊', label: 'Stats' },
+  { key: 'Journal', emoji: '📓', label: 'Journal' },
   { key: 'Settings', emoji: '⚙️', label: 'Settings' },
 ]
 

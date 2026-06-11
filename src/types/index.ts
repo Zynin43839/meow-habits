@@ -36,6 +36,36 @@ export interface UserSettings {
   notificationTime: string
 }
 
+export interface FocusSession {
+  id: string
+  date: string
+  task: string
+  workMinutes: number
+  breakMinutes: number
+  completedWork: number
+  completedBreak: number
+  totalFocusMinutes: number
+  sound: string
+  timestamp: number
+}
+
+export interface Task {
+  id: string
+  title: string
+  date: string
+  completed: boolean
+  priority: 'low' | 'medium' | 'high'
+  createdAt: number
+}
+
+export interface JournalEntry {
+  date: string
+  mood: number
+  note: string
+  gratitude: string
+  timestamp: number
+}
+
 export interface AIScheduleSuggestion {
   habitId: string
   habitName: string
